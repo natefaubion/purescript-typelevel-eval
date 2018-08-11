@@ -29,7 +29,7 @@ test _ _ = Unit
 
 Assert that all rows have a type `String`:
 
-```purescipt
+```purescript
 type RowAllString =
   Assert "Only String is allowed" <<< All (Eq String) <<< FromRow
 
