@@ -1,5 +1,5 @@
 {
-  "name": "purescript-type-eval",
+  "name": "purescript-typelevel-eval",
   "homepage": "https://github.com/natefaubion/purescript-typelevel-eval",
   "authors": [
     "Nathan Faubion <nathan@n-son.com>"
