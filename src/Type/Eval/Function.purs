@@ -39,22 +39,22 @@ instance flip ::
   ) =>
   Eval (Flip f a b) c
 
-foreign import data Bind :: (Type -> TypeExpr) -> TypeExpr -> TypeExpr
+foreign import data App :: (Type -> TypeExpr) -> TypeExpr -> TypeExpr
 
-instance bind ::
+instance appSeq ::
   ( Eval a b
   , Eval (f b) c
   ) =>
-  Eval (Bind f a) c
+  Eval (App f a) c
 
-infixl 0 type Bind as =<<
+infixr 0 type App as $
 
-foreign import data BindFlipped :: TypeExpr -> (Type -> TypeExpr) -> TypeExpr
+foreign import data AppFlipped :: TypeExpr -> (Type -> TypeExpr) -> TypeExpr
 
-instance bindFlipped ::
+instance appFlipped ::
   ( Eval a b
   , Eval (f b) c
   ) =>
-  Eval (BindFlipped a f) c
+  Eval (AppFlipped a f) c
 
-infixr 1 type BindFlipped as >>=
+infixl 1 type AppFlipped as #
