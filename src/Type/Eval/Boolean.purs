@@ -7,18 +7,28 @@ import Prelude (Unit)
 import Prim.TypeError (Text)
 import Type.Data.Boolean (BProxy, False, True, kind Boolean)
 import Type.Eval (class Eval, class EvalTypeError, Lift, Throw, kind TypeExpr)
+import Type.Eval.Function (type ($))
 
 type TrueExpr = Lift (BProxy True)
 type FalseExpr = Lift (BProxy False)
 
 foreign import data Eq :: Type -> Type -> TypeExpr
 
-instance eq_true ::
+instance eq_True ::
   Eval (Eq a a) (BProxy True)
-else instance eq_false ::
+else instance eq_False ::
   Eval (Eq a b) (BProxy False)
 
 infix 4 type Eq as ==
+
+foreign import data NotEq :: Type -> Type -> TypeExpr
+
+instance notEq_False ::
+  Eval (NotEq a a) (BProxy False)
+else instance notEq_True ::
+  Eval (NotEq a b) (BProxy True)
+
+infix 4 type NotEq as /=
 
 foreign import data Assert :: Symbol -> Type -> TypeExpr
 
@@ -52,70 +62,34 @@ foreign import data Not :: Type -> TypeExpr
 
 instance not_True ::
   Eval (Not (BProxy True)) (BProxy False)
-else instance not_Galse ::
+else instance not_False ::
   Eval (Not (BProxy False)) (BProxy True)
 else instance not_fail ::
   ( EvalTypeError "Not" "first argument" "BProxy" c
   ) =>
   Eval (Not a) b
 
-foreign import data And' :: Boolean -> TypeExpr -> TypeExpr
-
-instance and'_True ::
-  ( Eval b (BProxy c)
-  ) =>
-  Eval (And' True b) (BProxy c)
-
-instance and'_False ::
-  Eval (And' False b) (BProxy False)
-
 foreign import data And :: TypeExpr -> TypeExpr -> TypeExpr
 
 instance and ::
-  ( Eval a (BProxy a')
-  , Eval (And' a' b) (BProxy c)
+  ( Eval (Bool b FalseExpr $ a') c
   ) =>
-  Eval (And a b) (BProxy c)
+  Eval (And a b) c
 
 infixr 3 type And as &&
-
-foreign import data Or' :: Boolean -> TypeExpr -> TypeExpr
-
-instance or'_False ::
-  ( Eval b (BProxy c)
-  ) =>
-  Eval (Or' False b) (BProxy c)
-
-instance or'_Frue ::
-  Eval (Or' True b) (BProxy True)
 
 foreign import data Or :: TypeExpr -> TypeExpr -> TypeExpr
 
 instance or ::
-  ( Eval a (BProxy a')
-  , Eval (Or' a' b) (BProxy c)
+  ( Eval (Bool TrueExpr b $ a) c
   ) =>
-  Eval (Or a b) (BProxy c)
+  Eval (Or a b) c
 
 infixr 2 type Or as ||
-
-foreign import data Xor' :: Boolean -> TypeExpr -> TypeExpr
-
-instance xor'_False ::
-  ( Eval b (BProxy c)
-  ) =>
-  Eval (Xor' False b) (BProxy c)
-
-instance xor'_True ::
-  ( Eval b c
-  , Eval (Not c) d
-  ) =>
-  Eval (Xor' True b) d
 
 foreign import data Xor :: TypeExpr -> TypeExpr -> TypeExpr
 
 instance xor ::
-  ( Eval a (BProxy a')
-  , Eval (Xor' a' b) c
+  ( Eval (Bool (Not $ b) b $ a) c
   ) =>
   Eval (Xor a b) c
