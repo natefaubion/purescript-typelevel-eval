@@ -1,5 +1,14 @@
 {
   "name": "purescript-type-eval",
+  "homepage": "https://github.com/natefaubion/purescript-typelevel-eval",
+  "authors": [
+    "Nathan Faubion <nathan@n-son.com>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/natefaubion/purescript-typelevel-eval.git"
+  },
   "ignore": [
     "**/.*",
     "node_modules",
@@ -8,13 +17,11 @@
   ],
   "dependencies": {
     "purescript-prelude": "^4.1.0",
-    "purescript-console": "^4.1.0",
-    "purescript-effect": "^2.0.0",
     "purescript-typelevel-prelude": "^3.0.0",
-    "purescript-tuples": "^5.0.0",
-    "purescript-either": "^4.0.0"
+    "purescript-tuples": "^5.0.0"
   },
   "devDependencies": {
-    "purescript-psci-support": "^4.0.0"
+    "purescript-psci-support": "^4.0.0",
+    "purescript-effect": "^2.0.0"
   }
 }
