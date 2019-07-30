@@ -1,9 +1,9 @@
 module Type.Eval.RowList where
 
 import Prim.RowList (class RowToList)
-import Type.Data.RowList (RLProxy)
 import Type.Eval (class Eval, kind TypeExpr)
-import Type.Row (class ListToRow, RProxy)
+import Type.Prelude (RLProxy, RProxy)
+import Type.RowList (class ListToRow)
 
 foreign import data FromRow :: Type -> TypeExpr
 
