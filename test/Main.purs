@@ -9,7 +9,7 @@ import Type.Eval.Foldable (All)
 import Type.Eval.Function (type (<<<), Const)
 import Type.Eval.Functor (Map)
 import Type.Eval.RowList (FromRow, ToRow)
-import Type.Eval.ValueOf (ValueOf, fromValueOf, toValueOf)
+import Type.Eval.ValueOf (ValueOf, toValueOf, valueOf)
 import Type.Proxy (Proxy)
 import Type.Row (RProxy)
 
@@ -50,13 +50,13 @@ testValueOfString :: ValueOf (Elem String)
 testValueOfString = toValueOf 'a'
 
 testFromValueOfString :: Char
-testFromValueOfString = fromValueOf testValueOfString
+testFromValueOfString = valueOf testValueOfString
 
 testValueOfArray :: ValueOf (Elem (Array Int))
 testValueOfArray = toValueOf 1
 
 testFromValueOfArray :: Int
-testFromValueOfArray = fromValueOf testValueOfArray
+testFromValueOfArray = valueOf testValueOfArray
 
 main :: Effect Unit
 main = pure unit
