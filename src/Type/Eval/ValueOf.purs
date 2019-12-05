@@ -1,7 +1,7 @@
 module Type.Eval.ValueOf where
 
 import Data.Leibniz (Leibniz(..))
-import Type.Eval (class Eval, TEProxy, kind TypeExpr)
+import Type.Eval (class Eval, kind TypeExpr)
 import Unsafe.Coerce (unsafeCoerce)
 
 data ValueOf (expr :: TypeExpr)
@@ -15,5 +15,6 @@ unsafeToValueOf = unsafeCoerce
 valueOf :: forall expr a. Eval expr a => ValueOf expr -> a
 valueOf = unsafeCoerce
 
-toLeibniz :: forall expr a. Eval expr a => TEProxy expr -> Leibniz (ValueOf expr) a
-toLeibniz _ = Leibniz unsafeCoerce
+toLeibniz :: forall expr a. Eval expr a => Leibniz (ValueOf expr) a
+toLeibniz = Leibniz unsafeCoerce
+
