@@ -56,3 +56,5 @@ testValue = ValueOf.from 'a'
 test :: Char
 test = ValueOf.to testValue
 ```
+
+Note that you can use any `TypeExpr` to tag a `ValueOf`.
