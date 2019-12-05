@@ -39,3 +39,22 @@ test :: forall ri.
   Unit
 test _ = Unit
 ```
+
+## Emulating Type Families
+
+With `Type.Eval.ValueOf` we can emulate Haskell's Type Families via explicit coercions.
+
+```purescript
+foreign import data Elem :: Type -> TypeExpr
+
+instance evalElemString :: Eval (Elem String) Char
+instance evalElemArray :: Eval (Elem (Array a)) a
+
+testValue :: ValueOf (Elem String)
+testValue = ValueOf.from 'a'
+
+test :: Char
+test = ValueOf.to testValue
+```
+
+Note that you can use any `TypeExpr` to tag a `ValueOf`.

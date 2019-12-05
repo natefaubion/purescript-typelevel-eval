@@ -3,12 +3,14 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
-import Type.Eval (TEProxy(..), proxyEval)
+import Type.Eval (class Eval, TEProxy(..), proxyEval, kind TypeExpr)
 import Type.Eval.Boolean (BProxy, Eq, False, True)
 import Type.Eval.Foldable (All)
 import Type.Eval.Function (type (<<<), Const)
 import Type.Eval.Functor (Map)
 import Type.Eval.RowList (FromRow, ToRow)
+import Type.Eval.ValueOf (ValueOf)
+import Type.Eval.ValueOf as ValueOf
 import Type.Proxy (Proxy)
 import Type.Row (RProxy)
 
@@ -38,6 +40,24 @@ test_All_RowList2 ::
 test_All_RowList2 = proxyEval
   (TEProxy :: TEProxy
     (Test_All_RowList (RProxy (a :: String, b :: String, c :: Int))))
+
+foreign import data Elem :: Type -> TypeExpr
+
+instance evalElemString :: Eval (Elem String) Char
+
+instance evalElemArray :: Eval (Elem (Array a)) a
+
+testValueOfString :: ValueOf (Elem String)
+testValueOfString = ValueOf.from 'a'
+
+testFromValueOfString :: Char
+testFromValueOfString = ValueOf.to testValueOfString
+
+testValueOfArray :: ValueOf (Elem (Array Int))
+testValueOfArray = ValueOf.from 1
+
+testFromValueOfArray :: Int
+testFromValueOfArray = ValueOf.to testValueOfArray
 
 main :: Effect Unit
 main = pure unit

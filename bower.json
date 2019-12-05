@@ -18,7 +18,9 @@
   "dependencies": {
     "purescript-prelude": "^4.1.0",
     "purescript-typelevel-prelude": "^5.0.0",
-    "purescript-tuples": "^5.0.0"
+    "purescript-tuples": "^5.0.0",
+    "purescript-unsafe-coerce": "^4.0.0",
+    "purescript-leibniz": "^5.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0",
