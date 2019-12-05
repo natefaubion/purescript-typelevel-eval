@@ -51,8 +51,8 @@ instance evalElemString :: Eval (Elem String) Char
 instance evalElemArray :: Eval (Elem (Array a)) a
 
 testValue :: ValueOf (Elem String)
-testValue = toValueOf 'a'
+testValue = ValueOf.from 'a'
 
 test :: Char
-test = valueOf testValue
+test = ValueOf.to testValue
 ```

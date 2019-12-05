@@ -6,15 +6,15 @@ import Unsafe.Coerce (unsafeCoerce)
 
 data ValueOf (expr :: TypeExpr)
 
-toValueOf :: forall expr a. Eval expr a => a -> ValueOf expr
-toValueOf = unsafeToValueOf
+from :: forall expr a. Eval expr a => a -> ValueOf expr
+from = unsafeCoerce
 
-unsafeToValueOf :: forall expr a. a -> ValueOf expr
-unsafeToValueOf = unsafeCoerce
+unsafeFrom :: forall expr a. a -> ValueOf expr
+unsafeFrom = unsafeCoerce
 
-valueOf :: forall expr a. Eval expr a => ValueOf expr -> a
-valueOf = unsafeCoerce
+to :: forall expr a. Eval expr a => ValueOf expr -> a
+to = unsafeCoerce
 
-toLeibniz :: forall expr a. Eval expr a => Leibniz (ValueOf expr) a
-toLeibniz = Leibniz unsafeCoerce
+asLeibniz :: forall expr a. Eval expr a => Leibniz (ValueOf expr) a
+asLeibniz = Leibniz unsafeCoerce
 

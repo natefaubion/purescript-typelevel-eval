@@ -9,7 +9,8 @@ import Type.Eval.Foldable (All)
 import Type.Eval.Function (type (<<<), Const)
 import Type.Eval.Functor (Map)
 import Type.Eval.RowList (FromRow, ToRow)
-import Type.Eval.ValueOf (ValueOf, toValueOf, valueOf)
+import Type.Eval.ValueOf (ValueOf)
+import Type.Eval.ValueOf as ValueOf
 import Type.Proxy (Proxy)
 import Type.Row (RProxy)
 
@@ -47,16 +48,16 @@ instance evalElemString :: Eval (Elem String) Char
 instance evalElemArray :: Eval (Elem (Array a)) a
 
 testValueOfString :: ValueOf (Elem String)
-testValueOfString = toValueOf 'a'
+testValueOfString = ValueOf.from 'a'
 
 testFromValueOfString :: Char
-testFromValueOfString = valueOf testValueOfString
+testFromValueOfString = ValueOf.to testValueOfString
 
 testValueOfArray :: ValueOf (Elem (Array Int))
-testValueOfArray = toValueOf 1
+testValueOfArray = ValueOf.from 1
 
 testFromValueOfArray :: Int
-testFromValueOfArray = valueOf testValueOfArray
+testFromValueOfArray = ValueOf.to testValueOfArray
 
 main :: Effect Unit
 main = pure unit
