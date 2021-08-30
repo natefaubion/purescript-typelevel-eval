@@ -1,23 +1,22 @@
 module Type.Eval.Foldable where
 
-import Data.Symbol (SProxy)
+import Type.Proxy (Proxy)
 import Data.Tuple (Tuple)
 import Prim.RowList as RL
-import Type.Data.RowList (RLProxy)
-import Type.Eval (class Eval, kind TypeExpr)
+import Type.Eval (class Eval, TypeExpr)
 import Type.Eval.Boolean (Bool, FalseExpr, TrueExpr)
 
 foreign import data Foldr :: (Type -> TypeExpr -> TypeExpr) -> TypeExpr -> Type -> TypeExpr
 
 instance foldr_RowList_Cons ::
-  ( Eval (fn a (Foldr fn z (RLProxy rl))) ty
+  ( Eval (fn a (Foldr fn z (Proxy rl))) ty
   ) =>
-  Eval (Foldr fn z (RLProxy (RL.Cons sym a rl))) ty
+  Eval (Foldr fn z (Proxy (RL.Cons sym a rl))) ty
 
 instance foldr_RowList_Nil ::
   ( Eval z ty
   ) =>
-  Eval (Foldr fn z (RLProxy RL.Nil)) ty
+  Eval (Foldr fn z (Proxy RL.Nil)) ty
 
 instance foldr_Tuple ::
   ( Eval (fn a (Foldr fn z b)) ty
@@ -27,14 +26,14 @@ instance foldr_Tuple ::
 foreign import data FoldrWithIndex :: (Type -> Type -> TypeExpr -> TypeExpr) -> TypeExpr -> Type -> TypeExpr
 
 instance foldrWithIndex_RowList_Cons ::
-  ( Eval (fn (SProxy sym) a (FoldrWithIndex fn z (RLProxy rl))) ty
+  ( Eval (fn (Proxy sym) a (FoldrWithIndex fn z (Proxy rl))) ty
   ) =>
-  Eval (FoldrWithIndex fn z (RLProxy (RL.Cons sym a rl))) ty
+  Eval (FoldrWithIndex fn z (Proxy (RL.Cons sym a rl))) ty
 
 instance foldrWithIndex_RowList_Nil ::
   ( Eval z ty
   ) =>
-  Eval (FoldrWithIndex fn z (RLProxy RL.Nil)) ty
+  Eval (FoldrWithIndex fn z (Proxy RL.Nil)) ty
 
 foreign import data AllFold :: (Type -> TypeExpr) -> Type -> TypeExpr -> TypeExpr
 

@@ -1,7 +1,7 @@
 module Type.Eval.ValueOf where
 
 import Data.Leibniz (Leibniz(..))
-import Type.Eval (class Eval, kind TypeExpr)
+import Type.Eval (class Eval, TypeExpr)
 import Unsafe.Coerce (unsafeCoerce)
 
 data ValueOf (expr :: TypeExpr)

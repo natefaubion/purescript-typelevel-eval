@@ -1,8 +1,8 @@
 module Type.Eval.RowList where
 
 import Prim.RowList (class RowToList)
-import Type.Eval (class Eval, kind TypeExpr)
-import Type.Prelude (RLProxy, RProxy)
+import Type.Eval (class Eval, TypeExpr)
+import Type.Proxy (Proxy)
 import Type.RowList (class ListToRow)
 
 foreign import data FromRow :: Type -> TypeExpr
@@ -10,11 +10,11 @@ foreign import data FromRow :: Type -> TypeExpr
 instance fromRow ::
   ( RowToList r rl
   ) =>
-  Eval (FromRow (RProxy r)) (RLProxy rl)
+  Eval (FromRow (Proxy r)) (Proxy rl)
 
 foreign import data ToRow :: Type -> TypeExpr
 
 instance toRow ::
   ( ListToRow rl r
   ) =>
-  Eval (ToRow (RLProxy rl)) (RProxy r)
+  Eval (ToRow (Proxy rl)) (Proxy r)

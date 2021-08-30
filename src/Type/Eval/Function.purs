@@ -1,6 +1,6 @@
 module Type.Eval.Function where
 
-import Type.Eval (class Eval, kind TypeExpr)
+import Type.Eval (class Eval, TypeExpr)
 
 foreign import data Id :: Type -> TypeExpr
 
