@@ -1,45 +1,45 @@
 module Type.Eval.Boolean
-  ( module Type.Data.Boolean
-  , module Type.Eval.Boolean
+  ( module Type.Eval.Boolean
   ) where
 
 import Prelude (Unit)
+import Type.Proxy (Proxy)
 import Prim.TypeError (Text)
-import Type.Data.Boolean (BProxy, False, True)
-import Type.Eval (class Eval, class EvalTypeError, Lift, Throw, kind TypeExpr)
+import Prim.Boolean (False, True)
+import Type.Eval (class Eval, class EvalTypeError, Lift, Throw, TypeExpr)
 import Type.Eval.Function (type ($))
 
-type TrueExpr = Lift (BProxy True)
-type FalseExpr = Lift (BProxy False)
+type TrueExpr = Lift (Proxy True)
+type FalseExpr = Lift (Proxy False)
 
 foreign import data Eq :: Type -> Type -> TypeExpr
 
 instance eq_True ::
-  Eval (Eq a a) (BProxy True)
+  Eval (Eq a a) (Proxy True)
 else instance eq_False ::
-  Eval (Eq a b) (BProxy False)
+  Eval (Eq a b) (Proxy False)
 
 infix 4 type Eq as ==
 
 foreign import data NotEq :: Type -> Type -> TypeExpr
 
 instance notEq_False ::
-  Eval (NotEq a a) (BProxy False)
+  Eval (NotEq a a) (Proxy False)
 else instance notEq_True ::
-  Eval (NotEq a b) (BProxy True)
+  Eval (NotEq a b) (Proxy True)
 
 infix 4 type NotEq as /=
 
 foreign import data Assert :: Symbol -> Type -> TypeExpr
 
 instance assert_True ::
-  Eval (Assert sym (BProxy True)) Unit
+  Eval (Assert sym (Proxy True)) Unit
 else instance assert_False ::
   ( Eval (Throw "Assert" (Text sym)) a
   ) =>
-  Eval (Assert sym (BProxy False)) a
+  Eval (Assert sym (Proxy False)) a
 else instance assert_fail ::
-  ( EvalTypeError "Assert" "second argument" "BProxy" c
+  ( EvalTypeError "Assert" "second argument" "Proxy" c
   ) =>
   Eval (Assert a b) c
 
@@ -48,24 +48,24 @@ foreign import data Bool :: TypeExpr -> TypeExpr -> Type -> TypeExpr
 instance bool_True ::
   ( Eval a c
   ) =>
-  Eval (Bool a b (BProxy True)) c
+  Eval (Bool a b (Proxy True)) c
 else instance bool_False ::
   ( Eval b c
   ) =>
-  Eval (Bool a b (BProxy False)) c
+  Eval (Bool a b (Proxy False)) c
 else instance bool_fail ::
-  ( EvalTypeError "Bool" "third argument" "BProxy" c
+  ( EvalTypeError "Bool" "third argument" "Proxy" c
   ) =>
   Eval (Bool a b c) d
 
 foreign import data Not :: Type -> TypeExpr
 
 instance not_True ::
-  Eval (Not (BProxy True)) (BProxy False)
+  Eval (Not (Proxy True)) (Proxy False)
 else instance not_False ::
-  Eval (Not (BProxy False)) (BProxy True)
+  Eval (Not (Proxy False)) (Proxy True)
 else instance not_fail ::
-  ( EvalTypeError "Not" "first argument" "BProxy" c
+  ( EvalTypeError "Not" "first argument" "Proxy" c
   ) =>
   Eval (Not a) b
 
