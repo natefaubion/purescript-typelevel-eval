@@ -1,37 +1,40 @@
 module Type.Eval.Functor where
 
-import Data.Symbol (SProxy)
 import Data.Tuple (Tuple)
-import Prim.RowList as RL
-import Type.Data.RowList (RLProxy)
-import Type.Eval (class Eval, kind TypeExpr)
+import Prim.RowList (RowList)
+import Prim.RowList as RowList
+import Type.Eval (class Eval, TypeExpr)
+import Type.Eval.Dispatch (class Dispatch1, KindOf1)
+import Type.Eval.Tuple (Tuple')
 
-foreign import data Map :: (Type -> TypeExpr) -> Type -> TypeExpr
+foreign import data Map :: forall f a b. (a -> TypeExpr b) -> f a -> TypeExpr (f b)
+
+instance
+  ( Dispatch1 (KindOf1 f) (Map k f) g
+  ) =>
+  Eval (Map k f) g
 
 infixl 4 type Map as <$>
 
-instance map_RowList_Cons ::
-  ( Eval (fn a) b
-  , Eval (Map fn (RLProxy rl)) (RLProxy rl')
+instance
+  ( Eval (f a) a'
+  , Eval (Map f tail) tail'
   ) =>
-  Eval (Map fn (RLProxy (RL.Cons sym a rl))) (RLProxy (RL.Cons sym b rl'))
+  Dispatch1 RowList (Map f (RowList.Cons sym a tail)) (RowList.Cons sym a' tail')
+else instance
+  Dispatch1 RowList (Map f RowList.Nil) RowList.Nil
 
-instance map_RowList_Nil ::
-  Eval (Map fn (RLProxy RL.Nil)) (RLProxy RL.Nil)
-
-instance map_Tuple ::
-  ( Eval (fn a) a'
-  , Eval (fn b) b'
+instance
+  ( Eval (f b) b'
   ) =>
-  Eval (Map fn (Tuple a b)) (Tuple a' b')
+  Dispatch1 (Tuple a') (Map f (Tuple' ((a) :: a') b)) (Tuple' ((a) :: a') b')
 
-foreign import data MapWithIndex :: (Type -> Type -> TypeExpr) -> Type -> TypeExpr
+foreign import data MapWithIndex :: forall f i a b. (i -> a -> TypeExpr b) -> f a -> TypeExpr (f b)
 
-instance mapWithIndex_RowList_Cons ::
-  ( Eval (fn (SProxy sym) a) b
-  , Eval (MapWithIndex fn (RLProxy rl)) (RLProxy rl')
+instance
+  ( Eval (fn sym a) a'
+  , Eval (MapWithIndex f tail') tail'
   ) =>
-  Eval (MapWithIndex fn (RLProxy (RL.Cons sym a rl))) (RLProxy (RL.Cons sym b rl'))
-
-instance mapWithIndex_RowList_Nil ::
-  Eval (MapWithIndex fn (RLProxy RL.Nil)) (RLProxy RL.Nil)
+  Dispatch1 RowList (MapWithIndex f (RowList.Cons sym a tail)) (RowList.Cons sym a' tail')
+else instance
+  Dispatch1 RowList (MapWithIndex f RowList.Nil) RowList.Nil

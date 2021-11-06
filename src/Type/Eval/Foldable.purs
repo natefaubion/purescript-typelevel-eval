@@ -1,59 +1,68 @@
 module Type.Eval.Foldable where
 
-import Data.Symbol (SProxy)
 import Data.Tuple (Tuple)
-import Prim.RowList as RL
-import Type.Data.RowList (RLProxy)
-import Type.Eval (class Eval, kind TypeExpr)
+import Prim.RowList (RowList)
+import Prim.RowList as RowList
+import Type.Eval (class Eval, TypeExpr)
+import Type.Eval.Dispatch (class Dispatch1, KindOf1)
+import Type.Eval.Tuple (Tuple')
 import Type.Eval.Boolean (Bool, FalseExpr, TrueExpr)
 
-foreign import data Foldr :: (Type -> TypeExpr -> TypeExpr) -> TypeExpr -> Type -> TypeExpr
+foreign import data Foldr :: forall f a b. (a -> TypeExpr b -> TypeExpr b) -> TypeExpr b -> f a -> TypeExpr b
 
-instance foldr_RowList_Cons ::
-  ( Eval (fn a (Foldr fn z (RLProxy rl))) ty
+instance
+  ( Dispatch1 (KindOf1 f) (Foldr k b f) c
   ) =>
-  Eval (Foldr fn z (RLProxy (RL.Cons sym a rl))) ty
+  Eval (Foldr k b f) c
 
-instance foldr_RowList_Nil ::
-  ( Eval z ty
+instance
+  ( Eval (f a (Foldr f acc tail)) acc'
   ) =>
-  Eval (Foldr fn z (RLProxy RL.Nil)) ty
-
-instance foldr_Tuple ::
-  ( Eval (fn a (Foldr fn z b)) ty
+  Dispatch1 RowList (Foldr f acc (RowList.Cons sym a tail)) acc'
+else instance
+  ( Eval acc acc'
   ) =>
-  Eval (Foldr fn z (Tuple a b)) ty
+  Dispatch1 RowList (Foldr f acc RowList.Nil) acc'
 
-foreign import data FoldrWithIndex :: (Type -> Type -> TypeExpr -> TypeExpr) -> TypeExpr -> Type -> TypeExpr
-
-instance foldrWithIndex_RowList_Cons ::
-  ( Eval (fn (SProxy sym) a (FoldrWithIndex fn z (RLProxy rl))) ty
+instance
+  ( Eval (f b acc) acc'
   ) =>
-  Eval (FoldrWithIndex fn z (RLProxy (RL.Cons sym a rl))) ty
+  Dispatch1 (Tuple a') (Foldr f acc (Tuple' ((a) :: a') b)) acc'
 
-instance foldrWithIndex_RowList_Nil ::
-  ( Eval z ty
+foreign import data FoldrWithIndex :: forall f i a b. (i -> a -> TypeExpr b -> TypeExpr b) -> TypeExpr b -> f a -> TypeExpr b
+
+instance
+  ( Dispatch1 (KindOf1 f) (FoldrWithIndex k b f) c
   ) =>
-  Eval (FoldrWithIndex fn z (RLProxy RL.Nil)) ty
+  Eval (FoldrWithIndex k b f) c
 
-foreign import data AllFold :: (Type -> TypeExpr) -> Type -> TypeExpr -> TypeExpr
+instance
+  ( Eval (f sym a (FoldrWithIndex f acc tail)) acc'
+  ) =>
+  Dispatch1 RowList (FoldrWithIndex f acc (RowList.Cons sym a tail)) acc'
+else instance
+  ( Eval acc acc'
+  ) =>
+  Dispatch1 RowList (FoldrWithIndex f acc RowList.Nil) acc'
 
-instance allFold ::
-  ( Eval (fn a) a'
+foreign import data AllFold :: forall a. (a -> TypeExpr Boolean) -> a -> TypeExpr Boolean -> TypeExpr Boolean
+
+instance
+  ( Eval (f a) a'
   , Eval (Bool b FalseExpr a') c
   ) =>
-  Eval (AllFold fn a b) c
+  Eval (AllFold f a b) c
 
-type All (f :: Type -> TypeExpr) =
-  Foldr (AllFold f) TrueExpr
+type All :: forall g a. (a -> TypeExpr Boolean) -> g a -> TypeExpr Boolean
+type All f = Foldr (AllFold f) TrueExpr
 
-foreign import data SomeFold :: (Type -> TypeExpr) -> Type -> TypeExpr -> TypeExpr
+foreign import data AnyFold :: forall a. (a -> TypeExpr Boolean) -> a -> TypeExpr Boolean -> TypeExpr Boolean
 
-instance someFold ::
-  ( Eval (fn a) a'
+instance
+  ( Eval (f a) a'
   , Eval (Bool TrueExpr b a') c
   ) =>
-  Eval (SomeFold fn a b) c
+  Eval (AnyFold f a b) c
 
-type Some (f :: Type -> TypeExpr) =
-  Foldr (SomeFold f) FalseExpr
+type Any :: forall g a. (a -> TypeExpr Boolean) -> g a -> TypeExpr Boolean
+type Any f = Foldr (AnyFold f) FalseExpr

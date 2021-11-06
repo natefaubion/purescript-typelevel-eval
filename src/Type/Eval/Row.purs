@@ -1,61 +1,63 @@
 module Type.Eval.Row where
 
 import Prim.Row as Row
-import Type.Data.Row (RProxy)
-import Type.Eval (class Eval, kind TypeExpr)
-import Type.Eval.Function (type (<<<))
+import Type.Eval (class Eval, TypeExpr)
+import Type.Eval.Function (Const, type (<<<))
 
-foreign import data Prj :: Symbol -> Type -> TypeExpr
+foreign import data Prj :: forall k. Symbol -> Row k -> TypeExpr k
 
-instance prj ::
+instance
   ( Row.Cons sym ty rx r
   ) =>
-  Eval (Prj sym (RProxy r)) ty
+  Eval (Prj sym r) ty
 
-foreign import data Uncons :: (Type -> Type -> TypeExpr) -> Symbol -> Type -> TypeExpr
+foreign import data Uncons :: forall k r. (k -> Row k -> TypeExpr r) -> Symbol -> Row k -> TypeExpr r
 
-instance uncons ::
+instance
   ( Row.Cons sym ty r2 r1
-  , Eval (fn ty (RProxy r2)) x
+  , Eval (fn ty r2) x
   ) =>
-  Eval (Uncons fn sym (RProxy r1)) x
+  Eval (Uncons fn sym r1) x
 
-foreign import data Cons :: Symbol -> Type -> Type -> TypeExpr
+foreign import data Cons :: forall k. Symbol -> k -> Row k -> TypeExpr (Row k)
 
-instance cons ::
+instance
   ( Row.Cons sym ty r1 r2
   ) =>
-  Eval (Cons sym ty (RProxy r1)) (RProxy r2)
+  Eval (Cons sym ty r1) r2
 
-type Set sym a =
-  Cons sym a <<< Lacks sym
+type Insert :: forall k. Symbol -> k -> Row k -> TypeExpr (Row k)
+type Insert sym a = Cons sym a <<< Lacks sym
 
-foreign import data Modify :: (Type -> TypeExpr) -> Symbol -> Type -> TypeExpr
+type Set :: forall k. Symbol -> k -> Row k -> TypeExpr (Row k)
+type Set sym a = Modify (Const a) sym
 
-instance modify ::
+foreign import data Modify :: forall k. (k -> TypeExpr k) -> Symbol -> Row k -> TypeExpr (Row k)
+
+instance
   ( Row.Cons sym ty r2 r1
   , Eval (fn ty) ty'
   , Row.Cons sym ty' r2 r3
   ) =>
-  Eval (Modify fn sym (RProxy r1)) (RProxy r3)
+  Eval (Modify fn sym r1) r3
 
-foreign import data Nub :: Type -> TypeExpr
+foreign import data Nub :: forall k. Row k -> TypeExpr (Row k)
 
-instance nub ::
+instance
   ( Row.Nub r1 r2
   ) =>
-  Eval (Nub (RProxy r1)) (RProxy r2)
+  Eval (Nub r1) r2
 
-foreign import data Lacks :: Symbol -> Type -> TypeExpr
+foreign import data Lacks :: forall k. Symbol -> Row k -> TypeExpr (Row k)
 
-instance lacks ::
+instance
   ( Row.Lacks sym r
   ) =>
-  Eval (Lacks sym (RProxy r)) (RProxy r)
+  Eval (Lacks sym r) r
 
-foreign import data Union :: Type -> Type -> TypeExpr
+foreign import data Union :: forall k. Row k -> Row k -> TypeExpr (Row k)
 
-instance union ::
+instance
   ( Row.Union r1 r2 r3
   ) =>
-  Eval (Union (RProxy r1) (RProxy r2)) (RProxy r3)
+  Eval (Union r1 r2) r3

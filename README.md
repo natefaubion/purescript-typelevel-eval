@@ -20,7 +20,7 @@ type RowToString =
   ToRow <<< Map (Const String) <<< FromRow
 
 test :: forall ri ro.
-  Eval (RowToString (RProxy ri)) (RProxy ro) =>
+  Eval (RowToString ri) ro =>
   { | ri } ->
   { | ro } ->
   Unit
@@ -34,7 +34,7 @@ type RowAllString =
   Assert "Only String is allowed" <<< All (Eq String) <<< FromRow
 
 test :: forall ri.
-  Eval (RowAllString (RProxy ri)) Unit =>
+  Eval (RowAllString ri) Unit =>
   { | ri } ->
   Unit
 test _ = Unit

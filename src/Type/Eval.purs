@@ -1,24 +1,23 @@
 module Type.Eval where
 
-import Prim.TypeError (kind Doc, class Fail, Above, Beside, Quote, Text)
+import Prim.TypeError (Doc, class Fail, Above, Beside, Quote, Text)
 import Type.Proxy (Proxy(..))
 
-foreign import kind TypeExpr
+foreign import data TypeExpr :: forall k. k -> Type
 
-data TEProxy (expr :: TypeExpr) = TEProxy
-
-proxyEval :: forall expr ty. Eval expr ty => TEProxy expr -> Proxy ty
+proxyEval :: forall expr ty. Eval expr ty => Proxy expr -> Proxy ty
 proxyEval _ = Proxy
 
-class Eval (expr :: TypeExpr) (result :: Type) | expr -> result
-
-class EvalTypeError (name :: Symbol) (ctx :: Symbol) (expected :: Symbol) (ty :: Type)
+class Eval :: forall k. TypeExpr k -> k -> Constraint
+class Eval expr result | expr -> result
 
 infixr 2 type Beside as <>
 
 infixr 1 type Above as |>
 
-instance evalTypeError ::
+foreign import data TypeError :: forall a b c. Symbol -> Symbol -> a -> b -> TypeExpr c
+
+instance
   ( Fail
       (  Text "Error evaluating `" <> Text name <> Text "`"
       |> Text "  in " <> Text ctx <> Text ":"
@@ -27,11 +26,11 @@ instance evalTypeError ::
       |> Text "   but got `" <> Quote ty <> Text "`"
       )
   ) =>
-  EvalTypeError name ctx expected ty
+  Eval (TypeError name ctx expected ty) z
 
-foreign import data Throw :: Symbol -> Doc -> TypeExpr
+foreign import data Throw :: forall a. Symbol -> Doc -> TypeExpr a
 
-instance throw ::
+instance
   ( Fail
       (  Text "Error evaluating `" <> Text name <> Text "`:"
       |> Text "  " <> exc
@@ -39,17 +38,6 @@ instance throw ::
   ) =>
   Eval (Throw name exc) a
 
-foreign import data Lift :: Type -> TypeExpr
+foreign import data Lift :: forall k. k -> TypeExpr k
 
-instance lift ::
-  Eval (Lift a) a
-
-foreign import data Lift1 :: (Type -> Type) -> Type -> TypeExpr
-
-instance lift1 ::
-  Eval (Lift1 f a) (f a)
-
-foreign import data Lift2 :: (Type -> Type -> Type) -> Type -> Type -> TypeExpr
-
-instance lift2 ::
-  Eval (Lift2 f a b) (f a b)
+instance Eval (Lift a) a
