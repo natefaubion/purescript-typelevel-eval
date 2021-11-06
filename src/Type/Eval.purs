@@ -19,11 +19,11 @@ foreign import data TypeError :: forall a b c. Symbol -> Symbol -> a -> b -> Typ
 
 instance
   ( Fail
-      (  Text "Error evaluating `" <> Text name <> Text "`"
-      |> Text "  in " <> Text ctx <> Text ":"
-      |> Text ""
-      |> Text "  Expected `" <> Text expected <> Text "`"
-      |> Text "   but got `" <> Quote ty <> Text "`"
+      ( Text "Error evaluating `" <> Text name <> Text "`"
+          |> Text "  in " <> Text ctx <> Text ":"
+          |> Text ""
+          |> Text "  Expected `" <> Text expected <> Text "`"
+          |> Text "   but got `" <> Quote ty <> Text "`"
       )
   ) =>
   Eval (TypeError name ctx expected ty) z
@@ -32,8 +32,8 @@ foreign import data Throw :: forall a. Symbol -> Doc -> TypeExpr a
 
 instance
   ( Fail
-      (  Text "Error evaluating `" <> Text name <> Text "`:"
-      |> Text "  " <> exc
+      ( Text "Error evaluating `" <> Text name <> Text "`:"
+          |> Text "  " <> exc
       )
   ) =>
   Eval (Throw name exc) a

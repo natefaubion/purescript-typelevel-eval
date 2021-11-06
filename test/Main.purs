@@ -19,28 +19,34 @@ type Test_Map_RowList =
   ToRow <<< Map (Const String) <<< FromRow
 
 test_Map_RowList ::
-  (Proxy
-    (a :: String, b :: String, c :: String))
+  ( Proxy
+      (a :: String, b :: String, c :: String)
+  )
 test_Map_RowList = proxyEval
-  (Proxy :: _
-    (Test_Map_RowList (a :: Int, b :: Boolean, c :: Number)))
+  ( Proxy :: _
+      (Test_Map_RowList (a :: Int, b :: Boolean, c :: Number))
+  )
 
 type Test_All_RowList =
   All (Eq String) <<< FromRow
 
 test_All_RowList1 ::
-  (Proxy
-    True)
+  ( Proxy
+      True
+  )
 test_All_RowList1 = proxyEval
-  (Proxy :: _
-    (Test_All_RowList (a :: String, b :: String, c :: String)))
+  ( Proxy :: _
+      (Test_All_RowList (a :: String, b :: String, c :: String))
+  )
 
 test_All_RowList2 ::
-  (Proxy
-    False)
+  ( Proxy
+      False
+  )
 test_All_RowList2 = proxyEval
-  (Proxy :: _
-    (Test_All_RowList (a :: String, b :: String, c :: Int)))
+  ( Proxy :: _
+      (Test_All_RowList (a :: String, b :: String, c :: Int))
+  )
 
 foreign import data Elem :: Type -> TypeExpr Type
 
