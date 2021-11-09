@@ -1,20 +1,19 @@
 module Type.Eval.RowList where
 
-import Prim.RowList (class RowToList)
-import Type.Eval (class Eval, kind TypeExpr)
-import Type.Prelude (RLProxy, RProxy)
+import Prim.RowList (class RowToList, RowList)
+import Type.Eval (class Eval, TypeExpr)
 import Type.RowList (class ListToRow)
 
-foreign import data FromRow :: Type -> TypeExpr
+foreign import data FromRow :: forall k. Row k -> TypeExpr (RowList k)
 
-instance fromRow ::
+instance
   ( RowToList r rl
   ) =>
-  Eval (FromRow (RProxy r)) (RLProxy rl)
+  Eval (FromRow r) rl
 
-foreign import data ToRow :: Type -> TypeExpr
+foreign import data ToRow :: forall k. RowList k -> TypeExpr (Row k)
 
-instance toRow ::
+instance
   ( ListToRow rl r
   ) =>
-  Eval (ToRow (RLProxy rl)) (RProxy r)
+  Eval (ToRow rl) r

@@ -1,20 +1,14 @@
 module Type.Eval.Function where
 
-import Type.Eval (class Eval, kind TypeExpr)
+import Type.Eval (class Eval, TypeExpr)
 
-foreign import data Id :: Type -> TypeExpr
+foreign import data Const :: forall k. k -> k -> TypeExpr k
 
-instance id ::
-  Eval (Id a) a
+instance Eval (Const a b) a
 
-foreign import data Const :: Type -> Type -> TypeExpr
+foreign import data Compose :: forall a b c. (b -> TypeExpr c) -> (a -> TypeExpr b) -> a -> TypeExpr c
 
-instance const ::
-  Eval (Const a b) a
-
-foreign import data Compose :: (Type -> TypeExpr) -> (Type -> TypeExpr) -> Type -> TypeExpr
-
-instance compose ::
+instance
   ( Eval (g a) b
   , Eval (f b) c
   ) =>
@@ -22,9 +16,9 @@ instance compose ::
 
 infixr 9 type Compose as <<<
 
-foreign import data ComposeFlipped :: (Type -> TypeExpr) -> (Type -> TypeExpr) -> Type -> TypeExpr
+foreign import data ComposeFlipped :: forall a b c. (a -> TypeExpr b) -> (b -> TypeExpr c) -> a -> TypeExpr c
 
-instance composeFlipped ::
+instance
   ( Eval (f a) b
   , Eval (g b) c
   ) =>
@@ -32,16 +26,16 @@ instance composeFlipped ::
 
 infixr 9 type ComposeFlipped as >>>
 
-foreign import data Flip :: (Type -> Type -> TypeExpr) -> Type -> Type -> TypeExpr
+foreign import data Flip :: forall a b c. (a -> b -> TypeExpr c) -> b -> a -> TypeExpr c
 
-instance flip ::
+instance
   ( Eval (f b a) c
   ) =>
   Eval (Flip f a b) c
 
-foreign import data App :: (Type -> TypeExpr) -> TypeExpr -> TypeExpr
+foreign import data App :: forall a b. (a -> TypeExpr b) -> TypeExpr a -> TypeExpr b
 
-instance appSeq ::
+instance
   ( Eval a b
   , Eval (f b) c
   ) =>
@@ -49,9 +43,9 @@ instance appSeq ::
 
 infixr 0 type App as $
 
-foreign import data AppFlipped :: TypeExpr -> (Type -> TypeExpr) -> TypeExpr
+foreign import data AppFlipped :: forall a b. TypeExpr a -> (a -> TypeExpr b) -> TypeExpr b
 
-instance appFlipped ::
+instance
   ( Eval a b
   , Eval (f b) c
   ) =>
